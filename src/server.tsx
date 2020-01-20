@@ -16,7 +16,6 @@ app.use(bodyParser.json());
 
 const checkMockFolder = () => {
   if (!fs.existsSync(MOCK_PATH)) {
-    console.log(MOCK_PATH);
     fs.mkdirSync(MOCK_PATH);
     fs.writeFileSync(
       `${MOCK_PATH}/index.js`,
@@ -34,7 +33,6 @@ app.get('/endpoints', (req, res) => {
     checkMockFolder();
     decache(`${appRoot}/${MOCK_PATH}/index.js`);
     const content = require(`${appRoot}/${MOCK_PATH}/index.js`);
-    console.log('content', content);
     res.status(200).json(content);
   } catch (err) {
     res.status(500).json({
