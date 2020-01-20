@@ -2,3 +2,4 @@ node_modules
 lib
 mocks
 mockify.js
+dist

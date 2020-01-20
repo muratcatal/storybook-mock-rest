@@ -51,7 +51,7 @@ export const bindMock = (configuredAxios: any) => {
                     }
                     schema[key].push(generatedData);
                 }
-            } else if (value.startsWith('$')) {
+            } else if (typeof value !== 'object' && value.startsWith('$')) {
                 schema[key] = faker.fake(`{{${value.slice(1)}}}`);
             } else if (typeof value === 'object') {
                 generateMock(value);

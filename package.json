@@ -9,8 +9,9 @@
     "type-check:watch": "yarn type-check -- --watch",
     "build": "yarn build:types && yarn build:js",
     "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir lib/dist --extensions \".ts,.tsx\" --source-maps inline",
-    "start:server": "yarn build:js && node ./lib/dist/server.js"
+    "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
+    "start:server": "yarn build:js && node ./dist/server.js",
+    "prepublish": "yarn type-check && yarn build"
   },
   "keywords": [
     "mock",
@@ -47,7 +48,7 @@
     "react-dom": "^16.12.0"
   },
   "files": [
-    "lib/**/*",
+    "dist/**/*",
     "docs/**/*",
     "README.md",
     "*.js",
