@@ -25,6 +25,8 @@ export const bindMock = (configuredAxios: any) => {
     }
 
     const generateMock = (schema: any) => {
+        if (!schema) return;
+
         const keys = Object.keys(schema);
         for (const key of keys) {
             const value = schema[key];
