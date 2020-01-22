@@ -9,9 +9,10 @@
     "type-check:watch": "yarn type-check -- --watch",
     "build": "yarn build:types && yarn build:js",
     "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
+    "build:js": "jest && babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
     "start:server": "yarn build:js && node ./dist/server.js",
-    "prepublish": "yarn type-check && yarn build"
+    "prepublish": "yarn type-check && yarn build",
+    "test": "jest"
   },
   "keywords": [
     "mock",
@@ -43,7 +44,10 @@
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.2",
     "@types/faker": "^4.1.9",
+    "@types/jest": "^24.9.0",
     "@types/react": "^16.9.17",
+    "babel-jest": "^25.1.0",
+    "jest": "^25.1.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0"
   },
@@ -66,5 +70,8 @@
     "express": "^4.17.1",
     "faker": "^4.1.0",
     "node-run-cmd": "^1.0.1"
+  },
+  "peerDependencies": {
+    "axios": "^0.19.2"
   }
 }
