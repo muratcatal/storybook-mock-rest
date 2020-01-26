@@ -33,11 +33,16 @@ export const Panel: React.FC = () => {
     setForms([...forms]);
   }
   function handleChangeRadio(evt: any, id: number) {
+    debugger;
     const form = forms.find(form => form.formId === id);
     const newForms = forms.map(f => {
       if (f.formId === id) {
         f.isActive = true;
-      } else if (f.formId !== id && f.endpoint === form?.endpoint) {
+      } else if (
+        f.formId !== id &&
+        f.endpoint === form?.endpoint &&
+        f.method === form.method
+      ) {
         f.isActive = false;
       }
       return f;
@@ -217,7 +222,7 @@ export const Panel: React.FC = () => {
                   <input
                     type="radio"
                     onChange={e => handleChangeRadio(e, api.formId)}
-                    name={`${api.endpoint}_isActive`}
+                    name={`${api.endpoint}_${api.method}_isActive`}
                     value={1}
                     id={`active_${api.formId}`}
                     checked={Boolean(api.isActive)}
