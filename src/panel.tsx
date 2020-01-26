@@ -32,6 +32,19 @@ export const Panel: React.FC = () => {
     form[evt.target.name] = value;
     setForms([...forms]);
   }
+  function handleChangeRadio(evt: any, id: number) {
+    const form = forms.find(form => form.formId === id);
+    const newForms = forms.map(f => {
+      if (f.formId === id) {
+        f.isActive = true;
+      } else if (f.formId !== id && f.endpoint === form?.endpoint) {
+        f.isActive = false;
+      }
+      return f;
+    });
+
+    setForms([...newForms]);
+  }
 
   function handleSearch(evt: any) {
     const value = evt.target.value.toLowerCase();
@@ -51,6 +64,7 @@ export const Panel: React.FC = () => {
         responseCode,
         responseBody,
         hideForm,
+        isActive,
         ...formFields
       } = form;
       normalizedForm.push({
@@ -58,7 +72,7 @@ export const Panel: React.FC = () => {
         endpoint: endpoint.trim(),
         responseCode: responseCode.trim(),
         responseBody: responseBody ? JSON.parse(responseBody) : '',
-        isActive: true,
+        isActive: Boolean(isActive),
       });
     });
     const result = await saveEndpoint(type, normalizedForm);
@@ -79,6 +93,7 @@ export const Panel: React.FC = () => {
       responseCode: '200',
       delay: 0,
       dataAmount: '1',
+      isActive: false,
     };
 
     setForms([obj, ...forms]);
@@ -108,8 +123,8 @@ export const Panel: React.FC = () => {
         .filter(form => !form.hideForm)
         .map(api => {
           return (
-            <>
-              <div key={api.formId}>
+            <div key={api.formId}>
+              <div>
                 <div
                   style={{
                     display: 'flex',
@@ -197,9 +212,20 @@ export const Panel: React.FC = () => {
                     }}
                   />
                 </div>
+                <div>
+                  Active:{' '}
+                  <input
+                    type="radio"
+                    onChange={e => handleChangeRadio(e, api.formId)}
+                    name={`${api.endpoint}_isActive`}
+                    value={1}
+                    id={`active_${api.formId}`}
+                    checked={Boolean(api.isActive)}
+                  />
+                </div>
               </div>
               <hr />
-            </>
+            </div>
           );
         })}
     </div>

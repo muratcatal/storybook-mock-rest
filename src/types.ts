@@ -7,7 +7,7 @@ export interface IForm {
     delay: number;
     dataAmount: string;
     hideForm?: boolean;
-    isActive?: boolean;
+    isActive: boolean;
 }
 
 export interface IPanelParams {

@@ -16,6 +16,7 @@ export const getEndpoints = async (): Promise<IForm[] | null> => {
                     responseCode: api.responseCode,
                     delay: api.delay,
                     dataAmount: api.dataAmount || '1',
+                    isActive: Boolean(api.isActive)
                 };
 
                 forms.push(obj);
@@ -43,6 +44,7 @@ export const getEndpoint = async (type: string): Promise<IForm[] | null> => {
                     responseCode: api.responseCode,
                     delay: api.delay,
                     dataAmount: api.dataAmount || '1',
+                    isActive: Boolean(api.isActive)
                 };
 
                 forms.push(obj);
