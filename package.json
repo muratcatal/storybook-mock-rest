@@ -1,6 +1,6 @@
 {
   "name": "@og-morpheus/storybook-mock-rest",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Manage and mock your endpoints via Storybook panel",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
