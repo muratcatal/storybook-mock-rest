@@ -12,7 +12,8 @@
     "build:js": "jest && babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
     "start:server": "yarn build:js && node ./dist/server.js",
     "prepublish": "yarn type-check && yarn build",
-    "test": "jest"
+    "test": "jest",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "keywords": [
     "mock",

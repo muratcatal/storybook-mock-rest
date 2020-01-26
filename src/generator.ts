@@ -2,57 +2,119 @@ import MockAdapter from 'axios-mock-adapter';
 import faker from 'faker';
 import { getEndpoints } from './services';
 import { IForm } from './types';
+import url from 'url';
 
-const getMockedApi = async (config: any) => {
-    const result = await getEndpoints() as IForm[];
-    return result.find(api => {
+export const getMockedEndpoint = (endpoints: IForm[], config: {
+    url: string;
+    method: string;
+    baseURL?: string;
+}) => {
+    return endpoints.find(api => {
         const apiUrl = api.endpoint.startsWith('/')
             ? api.endpoint.slice(1)
             : api.endpoint;
 
-        const fullApiUrl = `${config.baseURL || '/'}${apiUrl}`;
+        let fullApiUrl: string = `${config.baseURL || '/'}${apiUrl}`;
+        if (config.url.startsWith('/') && !fullApiUrl.startsWith('/')) {
+            fullApiUrl = '/' + fullApiUrl;
+        }
+        if (!fullApiUrl.includes('*')) {
+            return (
+                (fullApiUrl === config.url) &&
+                api.method === config.method?.toUpperCase()
+            );
+        } else {
+            const parsedUrl = url.parse(fullApiUrl, true);
+            const pathParams = parsedUrl.pathname?.split('/') ?? [];
+            const parsedQueryParams = parsedUrl.query;
 
-        return (
-            (fullApiUrl === config.url) &&
-            api.method === config.method?.toUpperCase()
-        );
+            const incomingUrl = url.parse(config.url, true);
+            const incomingUrlPathParams = incomingUrl.pathname?.split('/') ?? [];
+            const incomingQueryParams = incomingUrl.query;
 
+            if (pathParams?.length !== incomingUrlPathParams.length) {
+                return null;
+            }
+
+            let continueForQueryParams = true;
+            for (let i = 0; i < pathParams.length; i++) {
+                if (pathParams[i] === '*' || pathParams[i] === incomingUrlPathParams[i]) {
+                    continue;
+                } else if (pathParams[i] !== incomingUrlPathParams[i]) {
+                    continueForQueryParams = false;
+                    break;
+                }
+            }
+
+            if (!continueForQueryParams) {
+                return null;
+            }
+
+            if (Object.keys(parsedQueryParams).length !== Object.keys(incomingQueryParams).length) {
+                return null;
+            }
+
+            const keys = Object.keys(parsedQueryParams);
+            let foundApi = true;
+            for (let key of keys) {
+                if (parsedQueryParams[key] === '*' || parsedQueryParams[key] === incomingQueryParams[key]) {
+                    continue;
+                } else {
+                    foundApi = false;
+                    break;
+                }
+            }
+
+            return foundApi;
+        }
     });
+}
+
+const getMockedApi = async (config: any) => {
+    const result = await getEndpoints() as IForm[];
+    return getMockedEndpoint(result, config);
 }
 
 export const generateMock = (schema: any) => {
     if (!schema) return;
 
-    const keys = Object.keys(schema);
-    for (const key of keys) {
-        const value = schema[key];
-        if (Array.isArray(value)) {
-            let generatedData;
-            let amountOfArray = 1;
-            if (value.length === 2) {
-                if (value[0].startsWith('{{repeat(')) {
-                    const repeatStr = value[0].toString();
-                    const startIndex = repeatStr.indexOf('(');
-                    const lastIndex = repeatStr.indexOf(')');
-                    amountOfArray = repeatStr.substring(startIndex + 1, lastIndex);
-                    value.shift();
+    if (typeof schema === "object") {
+        const keys = Object.keys(schema);
+        for (const key of keys) {
+            const value = schema[key];
+            if (Array.isArray(value)) {
+                let generatedData;
+                let amountOfArray = 1;
+                if (value.length === 2) {
+                    if (value[0].startsWith('{{repeat(')) {
+                        const repeatStr = value[0].toString();
+                        const startIndex = repeatStr.indexOf('(');
+                        const lastIndex = repeatStr.indexOf(')');
+                        amountOfArray = repeatStr.substring(startIndex + 1, lastIndex);
+                        value.shift();
+                    }
                 }
+                const arraySchema = JSON.parse(JSON.stringify(value));
+                for (let i = 0; i < amountOfArray; i++) {
+                    const mValue = JSON.parse(JSON.stringify(arraySchema));
+                    for (const arrayVal of mValue) {
+                        generatedData = generateMock(arrayVal);
+                    }
+                    if (i === 0) {
+                        schema[key].pop();
+                    }
+                    schema[key].push(generatedData);
+                }
+            } else if (typeof value !== 'object' && value.toString().startsWith('$')) {
+                const fakerValue: string[] = value.slice(1).split('.');
+                schema[key] = faker[fakerValue[0]][fakerValue[1]]();
+            } else if (typeof value === 'object') {
+                generateMock(value);
             }
-            const arraySchema = JSON.parse(JSON.stringify(value));
-            for (let i = 0; i < amountOfArray; i++) {
-                const mValue = JSON.parse(JSON.stringify(arraySchema));
-                for (const arrayVal of mValue) {
-                    generatedData = generateMock(arrayVal);
-                }
-                if (i === 0) {
-                    schema[key].pop();
-                }
-                schema[key].push(generatedData);
-            }
-        } else if (typeof value !== 'object' && value.toString().startsWith('$')) {
-            schema[key] = faker.fake(`{{${value.slice(1)}}}`);
-        } else if (typeof value === 'object') {
-            generateMock(value);
+        }
+    } else {
+        if (schema.toString().startsWith('$')) {
+            schema = faker.fake(`{{${schema.slice(1)}}}`);
         }
     }
     return schema;
