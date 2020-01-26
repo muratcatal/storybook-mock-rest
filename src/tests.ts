@@ -157,7 +157,7 @@ const mockedEndpoints: IForm[] = [
     method: 'GET',
     isActive: true,
     endpoint: '/test?q=*&k=1&y=2&z=*&m=3',
-    formId: 1,
+    formId: 2,
     responseBody: 'testBody',
     responseCode: '200',
     delay: 0,
@@ -167,7 +167,7 @@ const mockedEndpoints: IForm[] = [
     method: 'GET',
     isActive: true,
     endpoint: '/test/*/a/b/*/c',
-    formId: 1,
+    formId: 3,
     responseBody: 'testBody',
     responseCode: '200',
     delay: 0,
@@ -177,7 +177,17 @@ const mockedEndpoints: IForm[] = [
     method: 'GET',
     isActive: false,
     endpoint: '/test',
-    formId: 2,
+    formId: 4,
+    responseBody: 'testBody',
+    responseCode: '200',
+    delay: 0,
+    dataAmount: '1'
+  },
+  {
+    method: 'GET',
+    isActive: true,
+    endpoint: '/test/*/a/*/b/*?q=1&k=*&l=2',
+    formId: 5,
     responseBody: 'testBody',
     responseCode: '200',
     delay: 0,
@@ -225,5 +235,13 @@ describe('getMockApi', () => {
     });
 
     expect(endpoint).toBeUndefined();
+  });
+  test('should return complex url regex', () => {
+    const endpoint = getMockedEndpoint(mockedEndpoints, {
+      url: '/test/q/a/w/b/e?q=1&k=3&l=2',
+      method: 'get'
+    });
+
+    expect(endpoint?.formId).toEqual(5);
   });
 })
