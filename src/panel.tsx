@@ -32,6 +32,7 @@ export const Panel: React.FC = () => {
     form[evt.target.name] = value;
     setForms([...forms]);
   }
+
   function handleChangeRadio(evt: any, id: number) {
     debugger;
     const form = forms.find(form => form.formId === id);
