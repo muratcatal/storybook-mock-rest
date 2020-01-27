@@ -165,6 +165,9 @@ export const bindMock = (configuredAxios: any) => {
               reponseBody = mockedApi?.responseBody;
             }
             const mock = getMockData(+mockedApi.dataAmount, reponseBody);
+
+            console.info(`%c Request: [${mockedApi.method}] - ${config.url} | Responsed Data:`, 'color:yellow', mock);
+
             resolve([mockedApi.responseCode, mock]);
           } else {
             resolve([500, { success: false }]);
