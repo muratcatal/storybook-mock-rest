@@ -93,7 +93,7 @@ export const generateMock = (schema: any) => {
     const keys = Object.keys(schema);
     for (const key of keys) {
       const value = schema[key];
-      if (Array.isArray(value)) {
+      if (Array.isArray(value) && value.length > 0) {
         let generatedData;
         let amountOfArray = 1;
         if (value.length === 2 && typeof value[0] === 'string') {
@@ -103,6 +103,10 @@ export const generateMock = (schema: any) => {
             const lastIndex = repeatStr.indexOf(')');
             amountOfArray = +repeatStr.substring(startIndex + 1, lastIndex);
             value.shift();
+
+            if (amountOfArray === 0) {
+              value.shift();
+            }
           }
         }
         const arraySchema = JSON.parse(JSON.stringify(value));
@@ -151,8 +155,8 @@ export const bindMock = (configuredAxios: any) => {
 
   mock.onAny().reply(config => {
     return getMockedApi(config).then(mockedApi => {
-      return new Promise(function(resolve, reject) {
-        setTimeout(function() {
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
           if (mockedApi) {
             let reponseBody = '';
             try {

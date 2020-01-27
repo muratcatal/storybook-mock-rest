@@ -1,147 +1,6 @@
 import { generateMock, getMockedEndpoint } from './generator';
 import { IForm } from './types';
 
-// const schemas = [
-//   [{
-//     name: 'Murat',
-//     surname: 'Çatal',
-//     languages: ['Turkish', 'English'],
-//     places: {
-//       hometown: 'xxx',
-//       prop: {
-//         population: 1000000,
-//         isCapital: false,
-//       },
-//     },
-//   },'static schema',],
-//   {
-//     name: 'Murat',
-//     surname: 'Çatal',
-//     languages: [
-//       {
-//         name: '$name.firstName',
-//       },
-//     ],
-//     places: {
-//       hometown: 'xxx',
-//       prop: {
-//         population: 1000000,
-//         isCapital: false,
-//       },
-//     },
-//   },
-//   {
-//     name: '$name.firstName',
-//     surname: '$name.lastName',
-//     languages: ['{{repeat(2)}}', '$lorem.word'],
-//     places: {
-//       hometown: '$address.city',
-//       prop: {
-//         population: '$random.number',
-//         isCapital: '$random.boolean',
-//       },
-//     },
-//   },
-//   {
-//     name: '$name.firstName',
-//     surname: '$name.lastName',
-//     languages: [
-//       '{{repeat(2)}}',
-//       {
-//         name: '$lorem.word',
-//       },
-//     ],
-//     places: {
-//       hometown: '$address.city',
-//       prop: {
-//         population: '$random.number',
-//         isCapital: '$random.boolean',
-//       },
-//     },
-//   },
-// ];
-
-// describe('mock generator',()=> {
-//   test.each(schemas)('test',()=> {
-//     const mock = generateMock(schemas);
-//   })
-// })
-
-describe('mock generator', () => {
-  test('should generate static schema', () => {
-    const schema = {
-      name: 'Murat',
-      surname: 'Çatal',
-      languages: ['Turkish', 'English'],
-      places: {
-        hometown: 'xxx',
-        prop: {
-          population: 1000000,
-          isCapital: false,
-        },
-      },
-    };
-    expect(generateMock(schema)).toEqual(schema);
-  });
-
-  test('should generate static & dynamic schema', () => {
-    const schema = {
-      name: 'Murat',
-      surname: 'Çatal',
-      languages: [
-        {
-          name: '$name.firstName',
-        },
-      ],
-      places: {
-        hometown: 'xxx',
-        prop: {
-          population: 1000000,
-          isCapital: false,
-        },
-      },
-    };
-    expect(generateMock(schema)).toEqual(schema);
-  });
-
-  test('should generate dynamic data', () => {
-    const schema = {
-      name: '$name.firstName',
-      surname: '$name.lastName',
-      languages: ['{{repeat(2)}}', '$lorem.word'],
-      places: {
-        hometown: '$address.city',
-        prop: {
-          population: '$random.number',
-          isCapital: '$random.boolean',
-        },
-      },
-    };
-    expect(generateMock(schema)).toBeTruthy();
-  });
-
-  test('should generate dynamic # of n item in array', () => {
-    const schema = {
-      name: '$name.firstName',
-      surname: '$name.lastName',
-      languages: [
-        '{{repeat(2)}}',
-        {
-          name: '$lorem.word',
-        },
-      ],
-      places: {
-        hometown: '$address.city',
-        prop: {
-          population: '$random.number',
-          isCapital: '$random.boolean',
-        },
-      },
-    };
-    expect(generateMock(schema).languages).toHaveLength(2);
-  });
-});
-
 const mockedEndpoints: IForm[] = [
   {
     method: 'GET',
@@ -194,6 +53,135 @@ const mockedEndpoints: IForm[] = [
     dataAmount: '1'
   }
 ];
+
+interface ICity {
+  name: string;
+  population: string;
+}
+interface ICountry {
+  name: string;
+  cities: (ICity | string)[];
+}
+interface IMockSchema {
+  name?: string;
+  surname?: string;
+  languages?: string[];
+  countries?: (ICountry | string)[]
+}
+let schema: IMockSchema;
+const fakerApi = '$lorem.word';
+
+describe('mock generator', () => {
+  beforeEach(() => {
+    schema = {};
+  });
+
+  test('should not generate array item', () => {
+    const schema = {
+      languages: [],
+      cities: [
+        "{{repeat(0)}}",
+        {
+          name: "$lorem.word"
+        }
+      ]
+    };
+    expect(generateMock(schema).languages).toHaveLength(0);
+    expect(generateMock(schema).cities).toHaveLength(0);
+  });
+
+  test('should generate static schema', () => {
+    const schema = {
+      name: 'Murat',
+      surname: 'Çatal',
+      languages: ['Turkish', 'English'],
+      places: {
+        hometown: 'xxx',
+        prop: {
+          population: 1000000,
+          isCapital: false,
+        },
+      },
+    };
+    expect(generateMock(schema)).toEqual(schema);
+  });
+
+  test('should generate static & dynamic schema', () => {
+    const schema = {
+      name: 'Murat',
+      surname: 'Çatal',
+      languages: [
+        {
+          name: '$name.firstName',
+        },
+      ],
+      places: {
+        hometown: 'xxx',
+        prop: {
+          population: 1000000,
+          isCapital: false,
+        },
+      },
+    };
+    const generatedMock = generateMock(schema);
+    expect(generatedMock.languages).toHaveLength(1);
+    expect(generatedMock.languages[0].name).not.toContain("$");
+    expect(generatedMock.places.prop.population).toEqual(1000000);
+  });
+
+  test('should generate dynamic data', () => {
+    const schema = {
+      name: '$name.firstName',
+      surname: '$name.lastName',
+      languages: ['{{repeat(2)}}', '$lorem.word'],
+      hobies: [],
+      friends: [
+        '{{repeat(0)}}',
+        '$lorem.word'
+      ],
+      places: {
+        hometown: '$address.city',
+        prop: {
+          population: '$random.number',
+          isCapital: '$random.boolean',
+        },
+      },
+    };
+    const generatedMock = generateMock(schema);
+    expect(generatedMock.name).not.toContain('$');
+    expect(generatedMock.languages).toHaveLength(2);
+    expect(generatedMock.hobies).toHaveLength(0);
+    expect(generatedMock.friends).toHaveLength(0);
+    expect(generatedMock.languages[0]).not.toContain('$');
+    expect(generatedMock.languages[1]).not.toContain('$');
+    expect(generatedMock.places.hometown).not.toContain('$');
+    expect(generatedMock.places.prop.isCapital).not.toContain('$');
+    expect(generatedMock.places.prop.population).not.toContain('$');
+  });
+
+  test('should generate dynamic # of n item in array', () => {
+    const schema = {
+      name: '$name.firstName',
+      surname: '$name.lastName',
+      languages: [
+        '{{repeat(2)}}',
+        {
+          name: '$lorem.word',
+        },
+      ],
+      places: {
+        hometown: '$address.city',
+        prop: {
+          population: '$random.number',
+          isCapital: '$random.boolean',
+        },
+      },
+    };
+    const generatedMock = generateMock(schema);
+    expect(generatedMock.languages).toHaveLength(2);
+  });
+});
+
 describe('getMockApi', () => {
   test('should return endpoint without params', () => {
     const endpoint = getMockedEndpoint(mockedEndpoints, {
