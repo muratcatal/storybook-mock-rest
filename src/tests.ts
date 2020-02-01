@@ -1,4 +1,4 @@
-import { generateMock, getMockedEndpoint } from './generator';
+import { generateMock, getMockedEndpoint, getMockData } from './generator';
 import { IForm } from './types';
 
 const mockedEndpoints: IForm[] = [
@@ -74,6 +74,26 @@ const fakerApi = '$lorem.word';
 describe('mock generator', () => {
   beforeEach(() => {
     schema = {};
+  });
+
+  test('should not throw exception for mistyped faker api', () => {
+    const schema = {
+      name: '$name.firstame',
+    };
+    expect(generateMock(schema).name).toEqual('$name.firstame');
+  });
+
+  test('should not generate same objects', () => {
+    const schema = {
+      name: '$name.firstName',
+      surname: '$name.lastName',
+      age: 33
+    };
+    const mocks = getMockData(2, schema) as any[];
+    expect(mocks.length).toBe(2);
+    expect(mocks[0].name).not.toEqual(mocks[1].name);
+    expect(mocks[0].surname).not.toEqual(mocks[1].surname);
+    expect(mocks[0].age).toEqual(mocks[1].age);
   });
 
   test('should not generate array item', () => {

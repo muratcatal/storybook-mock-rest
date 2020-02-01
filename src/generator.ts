@@ -125,7 +125,11 @@ export const generateMock = (schema: any) => {
         value.toString().startsWith('$')
       ) {
         const fakerValue: string[] = value.slice(1).split('.');
-        schema[key] = faker[fakerValue[0]][fakerValue[1]]();
+        try {
+          schema[key] = faker[fakerValue[0]][fakerValue[1]]();
+        } catch (err) {
+          schema[key] = value;
+        }
       } else if (typeof value === 'object') {
         generateMock(value);
       }
@@ -138,10 +142,11 @@ export const generateMock = (schema: any) => {
   return schema;
 };
 
-const getMockData = (dataAmount: number, schema: any): any => {
+export const getMockData = (dataAmount: number, schema: any): any => {
   const result: any[] = [];
   for (let i = 0; i < dataAmount; i++) {
-    const generatedMock = generateMock(schema);
+    const mockSchema = JSON.parse(JSON.stringify(schema));
+    const generatedMock = generateMock(mockSchema);
     result.push(generatedMock);
   }
 
@@ -166,7 +171,7 @@ export const bindMock = (configuredAxios: any) => {
             }
             const mock = getMockData(+mockedApi.dataAmount, reponseBody);
 
-            console.info(`%c Request: [${mockedApi.method}] - ${config.url} | Responsed Data:`, 'color:yellow', mock);
+            console.info(`Request: [${mockedApi.method}] - ${config.url} | Responsed Data:`, mock);
 
             resolve([mockedApi.responseCode, mock]);
           } else {

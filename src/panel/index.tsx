@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { IForm, IPanelParams } from './types';
+import { IForm, IPanelParams } from '../types';
 import { useParameter } from '@storybook/api';
-import { PARAM_KEY } from './constants';
-import { getEndpoint, saveEndpoint } from './services';
+import { PARAM_KEY } from '../constants';
+import { getEndpoint, saveEndpoint } from '../services';
+import {
+  PanelHeader,
+  SearchWrapper,
+  ButtonWrapper,
+  PanelWrapper,
+} from './styles';
+import AceEditor from 'react-ace';
+import { Form, Description } from '@storybook/components';
+
+import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/theme-tomorrow';
+
+const Field = Form.Field;
+const Select = Form.Select;
+const Button = Form.Button;
+const Input = Form.Input;
 
 export const Panel: React.FC = () => {
   const [forms, setForms] = useState<IForm[]>([]);
@@ -25,16 +41,22 @@ export const Panel: React.FC = () => {
     };
   }, [type]);
 
-  function handleChange(evt: any, id: number) {
+  const handleChange = (evt: any, id: number) => {
     const form = forms.find(form => form.formId === id);
     const value = evt.target.value;
     //@ts-ignore
     form[evt.target.name] = value;
     setForms([...forms]);
-  }
+  };
 
-  function handleChangeRadio(evt: any, id: number) {
-    debugger;
+  const handleResponseBodyChange = (newValue: string, id: number) => {
+    const form = forms.find(form => form.formId === id);
+    //@ts-ignore
+    form.responseBody = newValue;
+    setForms([...forms]);
+  };
+
+  const handleChangeRadio = (evt: any, id: number) => {
     const form = forms.find(form => form.formId === id);
     const newForms = forms.map(f => {
       if (f.formId === id) {
@@ -50,16 +72,16 @@ export const Panel: React.FC = () => {
     });
 
     setForms([...newForms]);
-  }
+  };
 
-  function handleSearch(evt: any) {
+  const handleSearch = (evt: any) => {
     const value = evt.target.value.toLowerCase();
     forms.forEach(form => {
       form.hideForm = !form.endpoint.toLowerCase().includes(value);
     });
     setForms([...forms]);
     setSearch(value);
-  }
+  };
 
   const handleSave = async () => {
     let normalizedForm: Omit<IForm, 'formId'>[] = [];
@@ -111,127 +133,131 @@ export const Panel: React.FC = () => {
 
   return (
     <div>
-      <div>
-        <input
-          name={`search`}
-          value={search}
-          placeholder="Search endpoint"
-          onChange={handleSearch}
-        />
-        <button onClick={handleAddNewMock}>Add New Mock</button>
-        <button onClick={handleSave}>Save</button>
+      <PanelHeader>
+        <SearchWrapper>
+          <Input
+            name={`search`}
+            value={search}
+            placeholder="Search endpoint"
+            onChange={handleSearch}
+            size="100%"
+          />
+        </SearchWrapper>
+        <ButtonWrapper>
+          <Button onClick={handleAddNewMock}>Define new endpoint</Button>
+          <Button onClick={handleSave}>Save</Button>
+        </ButtonWrapper>
         <hr />
-      </div>
+      </PanelHeader>
       {forms.length === 0 && (
-        <div>No endpoint defined. Let's define an endpoint.</div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Description markdown="No endpoint defined. Let's define an endpoint." />
+        </div>
       )}
       {forms
         .filter(form => !form.hideForm)
         .map(api => {
           return (
-            <div key={api.formId}>
+            <PanelWrapper key={api.formId}>
               <div>
                 <div
                   style={{
                     display: 'flex',
-                    justifyContent: 'flex-end',
+                    justifyContent: 'space-between',
                   }}
                 >
-                  <button onClick={handleRemoveMock.bind(null, api.formId)}>
+                  <Field label="Active">
+                    <input
+                      type="checkbox"
+                      onChange={e => handleChangeRadio(e, api.formId)}
+                      name={`${api.endpoint}_${api.method}_isActive`}
+                      value={1}
+                      id={`active_${api.formId}`}
+                      checked={Boolean(api.isActive)}
+                    />
+                  </Field>
+                  <Button
+                    onClick={handleRemoveMock.bind(null, api.formId)}
+                    style={{ marginRight: 5 }}
+                  >
                     Remove
-                  </button>
+                  </Button>
                 </div>
-                <div>
-                  Endpoint:{' '}
-                  <input
+                <Field label="Endpint">
+                  <Input
                     name={`endpoint`}
                     value={api.endpoint}
                     placeholder="Endpoint"
                     onChange={e => handleChange(e, api.formId)}
-                    style={{
-                      width: '100%',
-                    }}
+                    size="100%"
                   />
-                </div>
-                <div>
-                  Delay:{' '}
-                  <input
+                </Field>
+                <Field label="Delay (ms)">
+                  <Input
                     name="delay"
                     value={api.delay}
                     placeholder="Delay"
                     onChange={e => handleChange(e, api.formId)}
-                    style={{
-                      width: '100%',
-                    }}
+                    size="100%"
                   />
-                </div>
-                <div>
-                  Data Amount:{' '}
-                  <input
+                </Field>
+                <Field label="Data amount">
+                  <Input
                     name="dataAmount"
                     value={api.dataAmount}
                     placeholder="Data amount"
                     onChange={e => handleChange(e, api.formId)}
-                    style={{
-                      width: '100%',
-                    }}
+                    size="100%"
                   />
-                </div>
-                <div>
-                  Method:
-                  <select
+                </Field>
+                <Field label="Method">
+                  <Select
                     value={api.method}
                     name="method"
                     onChange={e => handleChange(e, api.formId)}
-                    style={{
-                      width: '100%',
-                    }}
+                    size="100%"
                   >
                     <option>GET</option>
                     <option>POST</option>
                     <option>PUT</option>
                     <option>DELETE</option>
-                  </select>
-                </div>
-                <div>
-                  Response Code:
-                  <input
+                    <option>PATCH</option>
+                  </Select>
+                </Field>
+                <Field label="Response Code">
+                  <Input
                     onChange={e => handleChange(e, api.formId)}
                     name="responseCode"
                     value={api.responseCode}
                     placeholder="Endpoint"
-                    style={{
-                      width: '100%',
-                    }}
+                    size="100%"
                   />
-                </div>
-                <div>
-                  Response Schema:{' '}
-                  <textarea
-                    onChange={e => handleChange(e, api.formId)}
-                    name="responseBody"
+                </Field>
+                <Field>
+                  <AceEditor
+                    placeholder="Response schema"
+                    mode="json"
+                    theme="tomorrow"
+                    name="blah2"
+                    fontSize={13}
+                    width="100%"
+                    showPrintMargin={true}
+                    showGutter={true}
+                    highlightActiveLine={true}
                     value={api.responseBody}
-                    placeholder="Endpoint"
-                    rows={4}
-                    style={{
-                      width: '100%',
+                    onChange={e => handleResponseBodyChange(e, api.formId)}
+                    setOptions={{
+                      enableBasicAutocompletion: false,
+                      enableLiveAutocompletion: false,
+                      enableSnippets: false,
+                      showLineNumbers: false,
+                      tabSize: 2,
                     }}
                   />
-                </div>
-                <div>
-                  Active:{' '}
-                  <input
-                    type="radio"
-                    onChange={e => handleChangeRadio(e, api.formId)}
-                    name={`${api.endpoint}_${api.method}_isActive`}
-                    value={1}
-                    id={`active_${api.formId}`}
-                    checked={Boolean(api.isActive)}
-                  />
-                </div>
+                </Field>
               </div>
               <hr />
-            </div>
+            </PanelWrapper>
           );
         })}
     </div>

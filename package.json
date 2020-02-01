@@ -1,5 +1,5 @@
 {
-  "name": "@og-morpheus/storybook-mock-rest",
+  "name": "storybook-mock-rest",
   "version": "1.0.7",
   "description": "Manage and mock your endpoints via Storybook panel",
   "main": "dist/index.js",
@@ -62,17 +62,21 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.8.3",
-    "@storybook/addons": "^5.3.6",
-    "@storybook/components": "^5.3.6",
+    "@emotion/styled": "^10.0.27",
+    "@storybook/addons": "^5.3.9",
+    "@storybook/components": "^5.3.9",
+    "ace-builds": "^1.4.8",
     "app-root-path": "^3.0.0",
     "axios": "^0.19.2",
     "axios-mock-adapter": "^1.17.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "decache": "^4.5.1",
+    "emotion": "^10.0.27",
     "express": "^4.17.1",
     "faker": "^4.1.0",
-    "node-run-cmd": "^1.0.1"
+    "node-run-cmd": "^1.0.1",
+    "react-ace": "^8.0.0"
   },
   "peerDependencies": {}
 }
