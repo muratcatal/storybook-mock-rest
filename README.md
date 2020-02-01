@@ -1,6 +1,6 @@
 # Storybook Rest Endpoint Mock
 
-![latest-version](https://img.shields.io/github/v/release/muratcatal/storybook-mock-rest?style=plastic)
+![latest-version](https://img.shields.io/github/v/release/muratcatal/storybook-mock-rest?style=plastic) ![npm-version](https://img.shields.io/npm/v/storybook-mock-rest?style=plastic)
 
 Manage and mock your endpoints via Storybook panel
 
