@@ -12,7 +12,7 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 
 const checkMockFolder = () => {
   if (!fs.existsSync(MOCK_PATH)) {
@@ -62,6 +62,7 @@ app.post('/endpoints/:type', (req, res) => {
     const { type } = req.params;
     const body = req.body as IForm;
     checkMockFolder();
+
     fs.writeFileSync(
       `${MOCK_PATH}/${type}.${MOCK_FILE_TYPE}`,
       JSON.stringify(body, null, 2),
@@ -75,6 +76,7 @@ app.post('/endpoints/:type', (req, res) => {
         '/*new-import*/',
         `...require('${`./${type}.${MOCK_FILE_TYPE}`}'), /*new-import*/`
       );
+
       fs.writeFileSync(`${MOCK_PATH}/index.js`, `${newContent}`);
     }
     res.status(200).json({
