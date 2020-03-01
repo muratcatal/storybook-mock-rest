@@ -19,7 +19,12 @@ const checkMockFolder = () => {
     fs.mkdirSync(MOCK_PATH);
     fs.writeFileSync(
       `${MOCK_PATH}/index.js`,
-      'module.exports = [/*new-import*/]'
+      'module.exports = []'
+    );
+  }else if(!fs.existsSync(`${MOCK_PATH}/index.js`)){
+    fs.writeFileSync(
+      `${MOCK_PATH}/index.js`,
+      'module.exports = []'
     );
   }
 };
@@ -72,12 +77,24 @@ app.post('/endpoints/:type', (req, res) => {
     );
     const content = fs.readFileSync(`${MOCK_PATH}/index.js`, 'utf8');
     if (!content.includes(`./${type}.json`)) {
-      const newContent = content.replace(
-        '/*new-import*/',
-        `...require('${`./${type}.${MOCK_FILE_TYPE}`}'), /*new-import*/`
-      );
+      // checks if any import is added before
+      const isImportEmpty = /\[\s*\]/gm.test(content);
+      let newContent: string = '';
+      if(isImportEmpty){
+        const startIndex = /\[/gm.exec(content)?.index;
+        const lastIndex = /\]/gm.exec(content)?.index;
+        if(!startIndex || !lastIndex){
+          res.status(500).json({
+            error: 'Error occurred during creation of index files.',
+          });
+        }
+        newContent = `${content.substring(0,(startIndex as number)+1)}...require('${`./${type}.${MOCK_FILE_TYPE}`}')${content.substring(lastIndex as number)}`
+      }else {
+        const lastCharIndex = /\]/gm.exec(content)?.index;
+        newContent = `${content.substring(0,lastCharIndex)}, ...require('${`./${type}.${MOCK_FILE_TYPE}`}')]`
+      }
 
-      fs.writeFileSync(`${MOCK_PATH}/index.js`, `${newContent}`);
+      fs.writeFileSync(`${MOCK_PATH}/index.js`,newContent);
     }
     res.status(200).json({
       success: true,
