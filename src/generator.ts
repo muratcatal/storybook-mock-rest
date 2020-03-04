@@ -124,9 +124,9 @@ export const generateMock = (schema: any) => {
         typeof value === 'string' &&
         value.toString().startsWith('$')
       ) {
-        const fakerValue: string[] = value.slice(1).split('.');
+        const fakerValue: string = value.substr(1);
         try {
-          schema[key] = faker[fakerValue[0]][fakerValue[1]]();
+          schema[key] = faker.fake(`{{${fakerValue}}}`);
         } catch (err) {
           schema[key] = value;
         }

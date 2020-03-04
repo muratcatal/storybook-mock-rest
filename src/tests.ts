@@ -133,6 +133,7 @@ describe('mock generator', () => {
       languages: [
         {
           name: '$name.firstName',
+          date: '$date.recent(2)'
         },
       ],
       places: {
@@ -146,6 +147,7 @@ describe('mock generator', () => {
     const generatedMock = generateMock(schema);
     expect(generatedMock.languages).toHaveLength(1);
     expect(generatedMock.languages[0].name).not.toContain("$");
+    expect(generatedMock.languages[0].date).not.toContain("$");
     expect(generatedMock.places.prop.population).toEqual(1000000);
   });
 
@@ -211,6 +213,7 @@ describe('getMockApi', () => {
 
     expect(endpoint?.endpoint).toEqual(mockedEndpoints[0].endpoint);
   });
+
   test('should return endpoint with query params', () => {
     const endpoint = getMockedEndpoint(mockedEndpoints, {
       url: '/test?q=1&k=1&y=2&z=1&m=3',
@@ -219,6 +222,7 @@ describe('getMockApi', () => {
 
     expect(endpoint?.endpoint).toEqual(mockedEndpoints[1].endpoint);
   });
+
   test('should return endpoint with path params', () => {
     const endpoint = getMockedEndpoint(mockedEndpoints, {
       url: '/test/123/a/b/333/c',
@@ -227,6 +231,7 @@ describe('getMockApi', () => {
 
     expect(endpoint?.endpoint).toEqual(mockedEndpoints[2].endpoint);
   });
+
   test('should not return false actived endpoint', () => {
     const endpoint = getMockedEndpoint(mockedEndpoints, {
       url: '/test',
@@ -236,6 +241,7 @@ describe('getMockApi', () => {
     expect(endpoint?.isActive).toBeTruthy();
     expect(endpoint?.formId).toEqual(mockedEndpoints[0].formId);
   });
+
   test('should undefined', () => {
     const endpoint = getMockedEndpoint(mockedEndpoints, {
       url: '/test',
@@ -244,6 +250,7 @@ describe('getMockApi', () => {
 
     expect(endpoint).toBeUndefined();
   });
+
   test('should return complex url regex', () => {
     const endpoint = getMockedEndpoint(mockedEndpoints, {
       url: '/test/q/a/w/b/e?q=1&k=3&l=2',
