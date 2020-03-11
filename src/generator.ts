@@ -173,7 +173,7 @@ export const bindMock = (configuredAxios: any) => {
 
             console.info(`Request: [${mockedApi.method}] - ${config.url} | Responsed Data:`, mock);
 
-            resolve([mockedApi.responseCode, mock]);
+            resolve([+mockedApi.responseCode, mock]);
           } else {
             resolve([500, { success: false }]);
           }
