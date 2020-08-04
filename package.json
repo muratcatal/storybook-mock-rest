@@ -1,6 +1,6 @@
 {
   "name": "storybook-mock-rest",
-  "version": "1.1.3",
+  "version": "1.2.0",
   "description": "Manage and mock your endpoints via Storybook panel",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
