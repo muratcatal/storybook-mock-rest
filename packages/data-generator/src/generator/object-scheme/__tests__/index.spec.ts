@@ -17,7 +17,7 @@ jest.mock("faker", () => {
     }
 })
 
-describe('simple-scheme', () => {
+describe('object-scheme', () => {
     test("should generate static data from faker", () => {
         // simple static json
         expect(objectSchemeGenerator({
@@ -38,7 +38,7 @@ describe('simple-scheme', () => {
                 c: "c"
             }
         });
-        
+
         expect(objectSchemeGenerator({
             a: "a",
             b: {
@@ -90,7 +90,7 @@ describe('simple-scheme', () => {
             a: "{{name.firstName}}"
         })).toMatchObject({
             a: "MockName"
-        }); 
+        });
 
         expect(objectSchemeGenerator({
             a: "{{name.firstName}}",
@@ -112,6 +112,6 @@ describe('simple-scheme', () => {
                     g: "g"
                 }
             }
-        }); 
+        });
     })
 });

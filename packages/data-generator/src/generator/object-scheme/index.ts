@@ -1,6 +1,16 @@
 import { simpleSchemeGenerator } from "../simple-scheme";
 import { DataGenerator } from "..";
 
+/**
+ * Expects any valid JSON
+ * {
+ *  a: "a",
+ *  b: {
+ *    c: "c"
+ *  }
+ * }
+ * @param scheme valid JSON
+ */
 export const objectSchemeGenerator = (scheme: Object) => {
     const keys = Object.keys(scheme);
 

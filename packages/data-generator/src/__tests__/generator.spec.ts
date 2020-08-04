@@ -1,22 +1,25 @@
-import { DataGenerator } from "../generator";
+import { generateData } from "..";
 
-describe('data-generator',() => {
-    // test("should parse schema",() => {
-    //     // primitive type checks with static and faker versions
-    //     expect(DataGenerator.generateData("Hello")).toBe("Hello");
-    //     expect(DataGenerator.generateData("{{name.firstName}}")).not.toBe("{{name.firstName}}");
+describe('data-generator', () => {
+    test("should parse schema", () => {
+        const data = generateData({
+            dataAmount: {
+                min: 1
+            },
+            dataSchema: "hello"
+        });
+        expect(data).toBe("hello");
+    });
 
-    //     // object schema test
-    //     expect(DataGenerator.generateData({
-    //         name: "My name",
-    //         place: {
-    //             city: "Samsun"
-    //         }
-    //     })).toEqual({
-    //         name: "My name"
-    //     });
-    // });
-    test.todo("should generate empty,single and n items of data");
-    test.todo("should generate data with expected types");
-    test.todo("should throw error on exception");
+    test("should have length 10 item", () => {
+        const data = generateData({
+            dataAmount: {
+                min: 10
+            },
+            dataSchema: {
+                a: "a"
+            }
+        });
+        expect(data).toHaveLength(10);
+    });
 });

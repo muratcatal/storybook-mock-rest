@@ -1,1 +1,1 @@
-export {isEqualsEitherOf} from "./src"
+export { isEqualsEitherOf, getRandomNumber } from "./src"

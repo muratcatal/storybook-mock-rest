@@ -1,5 +1,8 @@
 export interface IDataGeneratorSchema {
-    dataAmount: number;
+    dataAmount: {
+        min: number;
+        max?: number;
+    };
     dataSchema: Object;
 }
 
