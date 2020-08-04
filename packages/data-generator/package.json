@@ -1,0 +1,8 @@
+{
+    "name": "@mock/data-generator",
+    "version": "0.0.1",
+    "dependencies": {
+        "@types/faker": "^4.1.12",
+        "faker": "^4.1.0"
+    }
+}
