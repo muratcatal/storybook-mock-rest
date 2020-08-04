@@ -10,8 +10,10 @@ export const getMockedEndpoint = (
     url: string;
     method: string;
     baseURL?: string;
+    params?: any;
   }
 ) => {
+
   return endpoints.find(api => {
     const apiUrl = api.endpoint.startsWith('/')
       ? api.endpoint.slice(1)
@@ -32,18 +34,20 @@ export const getMockedEndpoint = (
 
       const incomingUrl = url.parse(config.url, true);
       const incomingUrlPathParams = incomingUrl.pathname?.split('/') ?? [];
-      const incomingQueryParams = incomingUrl.query;
+      const incomingQueryParams = config.params ?? incomingUrl.query;
 
       if (pathParams?.length !== incomingUrlPathParams.length) {
         return null;
       }
 
       let continueForQueryParams = true;
+      let passQueryParamChecks = false;
       for (let i = 0; i < pathParams.length; i++) {
         if (
           pathParams[i] === '*' ||
           pathParams[i] === incomingUrlPathParams[i]
         ) {
+          passQueryParamChecks = true;
           continue;
         } else if (pathParams[i] !== incomingUrlPathParams[i]) {
           continueForQueryParams = false;
@@ -55,7 +59,7 @@ export const getMockedEndpoint = (
         return null;
       }
 
-      if (
+      if (!passQueryParamChecks &&
         Object.keys(parsedQueryParams).length !==
         Object.keys(incomingQueryParams).length
       ) {
@@ -171,7 +175,7 @@ export const bindMock = (configuredAxios: any) => {
             }
             const mock = getMockData(+mockedApi.dataAmount, reponseBody);
 
-            console.info(`Request: [${mockedApi.method}] - ${config.url} | Responsed Data:`, mock);
+            console.info(`Request is catched: [${mockedApi.method}] - ${config.url} - ${config.params} | Responsed Data:`, mock);
 
             resolve([+mockedApi.responseCode, mock]);
           } else {
