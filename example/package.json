@@ -9,7 +9,7 @@
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-scripts": "3.4.0",
-    "storybook-mock-rest": "file:///Programlar/kodlar/react/storybook-mock-rest"
+    "storybook-mock-rest": "file:///Users/murat/mrtctl/storybook-mock-rest"
   },
   "scripts": {
     "start": "react-scripts start",
