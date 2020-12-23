@@ -72,22 +72,29 @@ app.post('/endpoints/:type', (req, res) => {
 
     const content = fs.readFileSync(`${MOCK_PATH}/index.js`, 'utf8');
     if (!content.includes(`./${type}.json`)) {
-      debugger;
       const importVariable = type.replace(/[-_]/g, '');
       const newImport = `const ${importVariable} = require('./${type}.json')`;
       const moduleExportMatch = /module\.export/.exec(content);
-      let newContent = `module.exports = [...${importVariable}];`;
+      let newContent = `module.exports = [ ...${importVariable} ];`;
       if (moduleExportMatch) {
-        const lastCharIndex = /\]/gm.exec(content)?.index;
-        newContent = `${content.substring(
-          0,
-          lastCharIndex
-        )}, ...${importVariable}]`;
+        const allImports = /\[([^)]+)\]/.exec(content) || [];
+        const filteredImport = allImports[1]
+          .split(',')
+          .map((e) => e.trim())
+          .filter(Boolean);
+
+        filteredImport.push(`...${importVariable}`);
+
+        const firstCharIndex = /\[/gm.exec(content)?.index;
+        const withoutExport = content.substring(0, firstCharIndex);
+        newContent = `${withoutExport}[
+  ${filteredImport.join(`,
+  `)},
+  ]`;
       }
       fs.writeFileSync(
         `${MOCK_PATH}/index.js`,
-        `${newImport}\n
-          ${newContent};`
+        `${newImport}\n${newContent};`
       );
     }
 
