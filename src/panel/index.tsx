@@ -183,7 +183,7 @@ export const Panel: React.FC = () => {
                     Remove
                   </Button>
                 </div>
-                <Field label="Endpint">
+                <Field label="Endpoint">
                   <Input
                     name={`endpoint`}
                     value={api.endpoint}
